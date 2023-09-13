@@ -1,0 +1,3 @@
+.disabled {
+  @apply cursor-not-allowed bg-gray-500;
+}

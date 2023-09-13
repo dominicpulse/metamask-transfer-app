@@ -1,0 +1,114 @@
+<div class="flex items-center flex-col m-10">
+  <h1 class="text-3xl font-bold">Metamask Crypto Transfer</h1>
+
+  <div class="my-7">
+    <ng-container *ngIf="connected">
+      <p>Connected to Metamask ✅</p>
+    </ng-container>
+    <ng-container *ngIf="!connected">
+      <div>
+        <button (click)="connectWallet()" class="button-primary">
+          Connect to Metamask
+        </button>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="block lg:flex">
+    <app-chains-list
+      (selectedChainChange)="onSelectedChainChange($event)"
+      class="mr-10 pr-10 border-0 lg:border-r-2"
+    />
+
+    <div *ngIf="formGroup" [formGroup]="formGroup" class="min-w-[25rem] mt-2">
+      <div class="mb-4">
+        <label
+          for="recipientAddress"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Recipient Address:
+        </label>
+        <input
+          id="recipientAddress"
+          type="text"
+          placeholder="Enter recipient address..."
+          class="border rounded px-3 py-2 w-full"
+          [formControlName]="'recipientAddress'"
+        />
+        <div
+          *ngIf="
+            formGroup.get('recipientAddress')?.hasError('required') &&
+            formGroup.get('recipientAddress')?.touched
+          "
+          class="text-red-500"
+        >
+          Recipient address is required.
+        </div>
+        <div
+          *ngIf="
+            !formGroup.get('recipientAddress')?.hasError('required') &&
+            formGroup.get('recipientAddress')?.hasError('invalidAddress') &&
+            formGroup.get('recipientAddress')?.touched
+          "
+          class="text-red-500"
+        >
+          Invalid recipient address format.
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <p class="block text-sm font-medium text-gray-700 mb-1">
+          Amount to Send (will be converted to wei):
+        </p>
+        <input
+          id="amountToSend"
+          type="number"
+          placeholder="Enter amount..."
+          class="border rounded px-3 py-2 w-full"
+          [formControlName]="'amountToSend'"
+        />
+
+        <div
+          *ngIf="
+            formGroup.get('amountToSend')?.hasError('required') &&
+            formGroup.get('amountToSend')?.touched
+          "
+          class="text-red-500"
+        >
+          Amount is required.
+        </div>
+        <div
+          *ngIf="
+            formGroup.get('amountToSend')?.hasError('pattern') &&
+            formGroup.get('amountToSend')?.touched
+          "
+          class="text-red-500"
+        >
+          Invalid amount format.
+        </div>
+      </div>
+
+      <p class="mb-4">Selected network: {{ this.selectedEvmChain?.name }}</p>
+
+      <button
+        (click)="onSubmit()"
+        class="button-primary"
+        [disabled]="
+          !this.formGroup.valid || !this.selectedEvmChain || !this.connected
+        "
+      >
+        Send coins
+      </button>
+
+      <div *ngIf="transactionHash" class="mt-4">
+        <p>Transaction Hash: {{ transactionHash }}</p>
+        <a
+          [href]="etherscanUrl"
+          target="_blank"
+          class="font-bold cursor-pointer"
+          >View Transaction Details on Etherscan</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
